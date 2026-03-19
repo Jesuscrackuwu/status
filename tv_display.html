@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📺 Pantalla de Llamados</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            color: white;
+            overflow: hidden;
+        }
+
+        /* ========== LAYOUT PRINCIPAL ========== */
+        .tv-container {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            height: 100vh;
+            padding: 1rem 1.5rem;
+            gap: 1rem;
+        }
+
+        /* ========== HEADER ========== */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 16px;
+            padding: 0.8rem 1.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-title h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-logo {
+            font-size: 2rem;
+        }
+
+        .header-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.2rem;
+        }
+
+        .header-time {
+            font-size: 2.2rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 2px;
+            color: #a78bfa;
+        }
+
+        .header-fecha {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: capitalize;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: #4ade80;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: blink 1.5s ease-in-out infinite;
+            box-shadow: 0 0 8px #4ade80;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.2;
+            }
+        }
+
+        /* ========== CONTENIDO PRINCIPAL ========== */
+        .main-content {
+            display: grid;
+            grid-template-columns: 3fr 2fr;
+            gap: 1rem;
+            overflow: hidden;
+        }
+
+        /* ========== CONTENIDO PRINCIPAL: LISTA DE LLAMADOS ========== */
+        .panel-principal {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            overflow: hidden;
+        }
+
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .llamados-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: none; /* Ocultar en Firefox */
+        }
+
+        .llamados-list::-webkit-scrollbar {
+            display: none; /* Ocultar en Chrome/Safari */
+        }
+
+        .llamado-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideInNext 0.4s ease forwards;
+            position: relative;
+        }
+
+        @keyframes slideInNext {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .llamado-card.primero {
+            padding: 2.2rem 2.8rem;
+            border-color: rgba(167, 139, 250, 0.3);
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 0 40px rgba(167, 139, 250, 0.05);
+            animation: slideInFirst 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes slideInFirst {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .llamado-info {
+            display: flex;
+            flex-direction: column;
+            max-width: 65%;
+        }
+
+        .llamado-nombre {
+            font-size: 2rem;
+            font-weight: 800;
+            color: white;
+            text-transform: uppercase;
+            line-height: 1.1;
+            word-wrap: break-word;
+        }
+
+        .primero .llamado-nombre {
+            font-size: 3.5rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+
+        .llamado-destino {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            text-align: right;
+            min-width: 30%;
+        }
+
+        .destino-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+
+        .destino-valor {
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: #4ade80;
+            line-height: 1;
+        }
+
+        .primero .destino-valor {
+            font-size: 5rem;
+        }
+
+        .vacio-mensaje {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 1.5rem;
+            gap: 1rem;
+        }
+
+        .vacio-icono {
+            font-size: 4rem;
+            opacity: 0.3;
+        }
+
+        /* ========== PANEL DERECHO: HISTORIAL ========== */
+        .panel-historial {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .historial-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            overflow-y: auto;
+            flex: 1;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+        }
+
+        .historial-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 0.7rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+        }
+
+        .historial-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .historial-nombre {
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.9rem;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .historial-badge {
+            background: rgba(102, 126, 234, 0.3);
+            border: 1px solid rgba(102, 126, 234, 0.5);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .historial-hora {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .historial-vacio {
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 0.9rem;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        /* ========== FOOTER ========== */
+        .footer {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 0.8rem;
+        }
+
+        .footer-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* ==========================================
+           OVERLAY DE ANUNCIO — REDISEÑADO
+        ========================================== */
+        .anuncio-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        /* Fondo con gradiente animado */
+        .anuncio-overlay.active {
+            display: flex;
+        }
+
+        .anuncio-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #0a1628 0%, #0d2137 50%, #0a1a2e 100%);
+            z-index: 0;
+        }
+
+        .anuncio-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse 80% 60% at 50% 50%,
+                    rgba(74, 222, 128, 0.18) 0%,
+                    rgba(59, 130, 246, 0.10) 50%,
+                    transparent 100%);
+            animation: auraPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes auraPulse {
+
+            0%,
+            100% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.08);
+            }
+        }
+
+        /* Barra de progreso superior */
+        .anuncio-progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #4ade80, #3b82f6, #a78bfa);
+            border-radius: 0 0 4px 4px;
+            z-index: 2;
+            width: 100%;
+            transform-origin: left;
+            transition: transform linear;
+        }
+
+        /* Contenido del anuncio */
+        .anuncio-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 3rem;
+            max-width: 90vw;
+        }
+
+        .anuncio-icono {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            animation: iconPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes iconPop {
+            from {
+                opacity: 0;
+                transform: scale(0.3) rotate(-15deg);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        .anuncio-nombre {
+            font-size: clamp(3rem, 8vw, 7rem);
+            font-weight: 900;
+            color: white;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            line-height: 1;
+            text-shadow: 0 0 60px rgba(255, 255, 255, 0.3);
+            animation: slideUpBig 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideUpBig {
+            from {
+                opacity: 0;
+                transform: translateY(60px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .anuncio-pase {
+            font-size: clamp(1.2rem, 2.5vw, 2rem);
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            animation: fadeInDelay 0.5s ease 0.15s both;
+        }
+
+        @keyframes fadeInDelay {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .anuncio-consultorio {
+            font-size: clamp(4rem, 12vw, 10rem);
+            font-weight: 900;
+            color: #4ade80;
+            line-height: 1;
+            text-shadow: 0 0 80px rgba(74, 222, 128, 0.6);
+            animation: zoomInBig 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+        }
+
+        @keyframes zoomInBig {
+            from {
+                opacity: 0;
+                transform: scale(0.4);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .anuncio-repeticion {
+            margin-top: 2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50px;
+            padding: 0.5rem 1.5rem;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.5);
+            animation: fadeInDelay 0.5s ease 0.3s both;
+        }
+
+        /* ==========================================
+           BANNER AUDIO
+        ========================================== */
+        .audio-banner {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            z-index: 2000;
+            box-shadow: 0 8px 30px rgba(245, 158, 11, 0.4);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            50% {
+                transform: translateX(-50%) translateY(-6px);
+            }
+        }
+
+        .audio-banner.hidden {
+            display: none;
+        }
+
+        /* ==========================================
+           PANTALLA DE BIENVENIDA (webOS + Audio)
+        ========================================== */
+        .welcome-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            cursor: pointer;
+        }
+
+        .welcome-overlay.hidden {
+            display: none;
+        }
+
+        .welcome-content {
+            text-align: center;
+            max-width: 800px;
+            padding: 3rem;
+        }
+
+        .welcome-logo {
+            font-size: 8rem;
+            margin-bottom: 2rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .welcome-title {
+            font-size: 3rem;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 0.8rem;
+            background: linear-gradient(135deg, #a78bfa, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.4rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 3rem;
+        }
+
+        .welcome-button {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 800;
+            padding: 1.5rem 4rem;
+            border: none;
+            border-radius: 100px;
+            cursor: pointer;
+            box-shadow: 0 10px 40px rgba(74, 222, 128, 0.4);
+            animation: pulse-btn 2s infinite;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .welcome-button:hover,
+        .welcome-button:focus {
+            transform: scale(1.05);
+            box-shadow: 0 15px 50px rgba(74, 222, 128, 0.6);
+        }
+
+        @keyframes pulse-btn {
+
+            0%,
+            100% {
+                box-shadow: 0 10px 40px rgba(74, 222, 128, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 10px 60px rgba(74, 222, 128, 0.7);
+            }
+        }
+
+        .welcome-hint {
+            margin-top: 2rem;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .welcome-webos-notice {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid rgba(245, 158, 11, 0.5);
+            border-radius: 10px;
+            color: #fbbf24;
+            font-size: 1rem;
+        }
+
+        /* ==========================================
+           RESPONSIVE — TV 1080p/1440p
+        ========================================== */
+        @media (min-width: 1920px) {
+            .header-title h1 {
+                font-size: 2.2rem;
+            }
+
+            .header-time {
+                font-size: 3rem;
+            }
+
+            .nombre-protagonista {
+                font-size: 6rem;
+            }
+
+            .destino-valor {
+                font-size: 8rem;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .panel-historial {
+                max-height: 200px;
+            }
+
+            .nombre-protagonista {
+                font-size: 3rem;
+            }
+
+            .destino-valor {
+                font-size: 4rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .tv-container {
+                padding: 0.8rem;
+                gap: 0.8rem;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 0.5rem;
+                padding: 0.8rem;
+                text-align: center;
+            }
+
+            .header-title {
+                flex-direction: column;
+                gap: 0.3rem;
+            }
+
+            .header-title h1 {
+                font-size: 1.2rem;
+            }
+
+            .header-time {
+                font-size: 1.5rem;
+            }
+
+            .nombre-protagonista {
+                font-size: 2rem;
+            }
+
+            .destino-valor {
+                font-size: 3rem;
+            }
+
+            .anuncio-nombre {
+                font-size: 2.5rem;
+            }
+
+            .anuncio-consultorio {
+                font-size: 5rem;
+            }
+
+            .welcome-logo {
+                font-size: 5rem;
+            }
+
+            .welcome-title {
+                font-size: 2rem;
+            }
+
+            .welcome-button {
+                font-size: 1.2rem;
+                padding: 1rem 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Pantalla bienvenida para activar audio (webOS + navegadores modernos) -->
+    <div class="welcome-overlay" id="welcome-overlay">
+        <div class="welcome-content">
+            <div class="welcome-logo">🏥</div>
+            <h1 class="welcome-title">IPSI WAYUU TALATSHI</h1>
+            <p class="welcome-subtitle">Sistema de Llamado de Turnos</p>
+            <button class="welcome-button" id="welcome-button">
+                🔊 INICIAR CON AUDIO
+            </button>
+            <p class="welcome-hint">Presione el botón para activar los anuncios de voz</p>
+            <div class="welcome-webos-notice" id="webos-notice" style="display: none;">
+                📺 TV detectada — Es necesario presionar el botón para habilitar el audio
+            </div>
+        </div>
+    </div>
+
+    <!-- Banner reactivar audio -->
+    <div class="audio-banner hidden" id="audio-banner">🔊 CLIC AQUÍ PARA REACTIVAR AUDIO</div>
+
+    <!-- ============ PANTALLA PRINCIPAL ============ -->
+    <div class="tv-container">
+
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-title">
+                <span class="header-logo">🏥</span>
+                <h1>IPSI WAYUU TALATSHI</h1>
+            </div>
+            <div class="header-center">
+                <div class="header-time" id="clock">--:--:--</div>
+                <div class="header-fecha" id="fecha">--</div>
+            </div>
+            <div class="status-indicator">
+                <span class="status-dot"></span>
+                <span>EN LÍNEA</span>
+            </div>
+        </header>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="main-content">
+
+            <!-- PANEL IZQUIERDO: LLAMADOS ACTIVOS -->
+            <div class="panel-principal">
+                <div class="panel-title">📢 Llamados Activos</div>
+                <div class="llamados-list" id="llamados-list">
+                    <!-- Se rellena por JS -->
+                    <div class="vacio-mensaje">
+                        <div class="vacio-icono">🏥</div>
+                        <div>Esperando llamados...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANEL DERECHO: HISTORIAL -->
+            <div class="panel-historial">
+                <div class="panel-title">🕐 Historial del día</div>
+                <div class="historial-list" id="historial-list">
+                    <div class="historial-vacio">Sin registros</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <div class="footer-item">📅 <span id="fecha-footer">--</span></div>
+            <div class="footer-item">💡 Sistema de Llamado Profesional</div>
+        </footer>
+
+    </div>
+
+    <!-- ============ OVERLAY DE ANUNCIO (REDISEÑADO) ============ -->
+    <div class="anuncio-overlay" id="anuncio-overlay">
+        <div class="anuncio-bg"></div>
+        <div class="anuncio-progress-bar" id="anuncio-progress-bar"></div>
+        <div class="anuncio-content">
+            <div class="anuncio-icono" id="anuncio-icono">📢</div>
+            <div class="anuncio-nombre" id="anuncio-nombre"></div>
+            <div class="anuncio-pase" id="anuncio-pase">Pase al</div>
+            <div class="anuncio-consultorio" id="anuncio-destino-texto"></div>
+            <div class="anuncio-repeticion" id="anuncio-repeticion"></div>
+        </div>
+    </div>
+
+    <script>
+        // ========== CONFIGURACIÓN ==========
+        var API_URL = '/profesionales/api/llamados/';
+        var API_ANUNCIADO = '/profesionales/api/anunciado/';
+        var INTERVALO_POLLING = 1000;   // 1 segundo
+        var TIEMPO_MOSTRAR = 6000;      // 6 segundos mostrando overlay después del audio
+        var PAUSA_REPETICION = 1000;    // 1 segundo entre repeticiones
+        var VECES_REPETIR = 2;          // Repetir 2 veces
+
+        // ========== ESTADO ==========
+        var audioActivado = false;
+        var procesandoAnuncio = false;
+        var idActualAnunciando = null; // ⚡️ NUEVO: Evita duplicados durante el anuncio
+        var colaAnuncios = [];
+        var idsYaProcesados = {};
+        var esWebOS = false;
+        var audioContext = null;
+
+        // ========== MAPA DE ESPECIALIDADES ==========
+        var ESPECIALIDADES = {
+            '6': 'Odontología',
+            '8': 'Psicología'
+        };
+
+        // ========== DETECCIÓN webOS ==========
+        function detectarWebOS() {
+            var ua = navigator.userAgent.toLowerCase();
+            esWebOS = ua.indexOf('webos') !== -1 ||
+                ua.indexOf('web0s') !== -1 ||
+                ua.indexOf('netcast') !== -1 ||
+                ua.indexOf('smarttv') !== -1 ||
+                (typeof window.webOS !== 'undefined') ||
+                (typeof window.PalmSystem !== 'undefined');
+            if (esWebOS) console.log('[TV] webOS detectado');
+            return esWebOS;
+        }
+
+        // ========== PERMISOS DE AUDIO + FULLSCREEN ==========
+        async function solicitarPermisosAudio() {
+            console.log('[TV] Solicitando permisos de audio...');
+            var welcomeOverlay = document.getElementById('welcome-overlay');
+
+            // 🚀 Fullscreen automático desactivado (según feedback del usuario)
+            /*
+            try {
+                var el = document.documentElement;
+                if (el.requestFullscreen) el.requestFullscreen();
+                else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+                console.log('[TV] Fullscreen solicitado');
+            } catch (fsErr) {
+                console.warn('[TV] Fullscreen no disponible:', fsErr);
+            }
+            */
+
+            try {
+                var AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioContextClass) {
+                    audioContext = new AudioContextClass();
+                    await audioContext.resume();
+                    console.log('[TV] AudioContext activado:', audioContext.state);
+                }
+
+                audioActivado = true;
+
+                console.log('[TV] Usando Edge-TTS (Microsoft Neural Voices)');
+                var textoTest = 'Bienvenido Al Sistema';
+                var urlTest = '/profesionales/api/tts/?texto=' + encodeURIComponent(textoTest);
+                var audioTest = new Audio(urlTest);
+                audioTest.play().catch(function (e) { console.warn('[TV] Error audio prueba:', e); });
+
+                console.log('[TV] ✓ Audio activado');
+
+                if (welcomeOverlay) welcomeOverlay.classList.add('hidden');
+                var banner = document.getElementById('audio-banner');
+                if (banner) banner.classList.add('hidden');
+
+                return true;
+            } catch (error) {
+                console.error('[TV] Error permisos audio:', error);
+                audioActivado = true;
+                if (welcomeOverlay) welcomeOverlay.classList.add('hidden');
+                return false;
+            }
+        }
+
+        // ========== INICIALIZACIÓN ==========
+        function inicializarSistema() {
+            var welcomeButton = document.getElementById('welcome-button');
+            var audioBanner = document.getElementById('audio-banner');
+
+            detectarWebOS();
+
+            if (welcomeButton) {
+                welcomeButton.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    solicitarPermisosAudio();
+                });
+                welcomeButton.addEventListener('touchend', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    solicitarPermisosAudio();
+                });
+            }
+
+            if (audioBanner) {
+                audioBanner.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    solicitarPermisosAudio();
+                });
+            }
+
+            if (esWebOS) {
+                var notice = document.getElementById('webos-notice');
+                if (notice) notice.style.display = 'block';
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', inicializarSistema);
+        } else {
+            inicializarSistema();
+        }
+
+        // ========== RELOJ ==========
+        function actualizarReloj() {
+            var now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleTimeString('es-CO');
+            var fechaStr = now.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' });
+            document.getElementById('fecha').textContent = fechaStr;
+            document.getElementById('fecha-footer').textContent = fechaStr;
+        }
+        setInterval(actualizarReloj, 1000);
+        actualizarReloj();
+
+        // ========== TTS ==========
+        var API_TTS = '/profesionales/api/tts/';
+        var audioElementTTS = null;
+
+        function hablar(texto, callback) {
+            if (!audioActivado) {
+                var banner = document.getElementById('audio-banner');
+                if (banner) banner.classList.remove('hidden');
+                if (callback) callback();
+                return;
+            }
+
+            console.log('[TV] Hablando:', texto);
+
+            if (audioElementTTS) {
+                audioElementTTS.pause();
+                audioElementTTS = null;
+            }
+
+            var url = API_TTS + '?texto=' + encodeURIComponent(texto);
+            audioElementTTS = new Audio(url);
+
+            audioElementTTS.onended = function () {
+                console.log('[TV] TTS terminó');
+                if (callback) callback();
+            };
+            audioElementTTS.onerror = function (e) {
+                console.error('[TV] Error TTS:', e);
+                if (callback) callback();
+            };
+            audioElementTTS.play().catch(function (error) {
+                console.error('[TV] Error al reproducir TTS:', error);
+                if (callback) callback();
+            });
+        }
+
+        // ========== BARRA DE PROGRESO DEL ANUNCIO ==========
+        var progressTimer = null;
+
+        function iniciarProgressBar(duracionMs) {
+            var bar = document.getElementById('anuncio-progress-bar');
+            if (!bar) return;
+            bar.style.transition = 'none';
+            bar.style.transform = 'scaleX(1)';
+            // Forzar reflow
+            bar.getBoundingClientRect();
+            bar.style.transition = 'transform ' + (duracionMs / 1000) + 's linear';
+            bar.style.transform = 'scaleX(0)';
+        }
+
+        function resetProgressBar() {
+            var bar = document.getElementById('anuncio-progress-bar');
+            if (!bar) return;
+            bar.style.transition = 'none';
+            bar.style.transform = 'scaleX(1)';
+        }
+
+        // ========== OVERLAY DE ANUNCIO ==========
+        function mostrarOverlay(nombre, consultorio, numRepeticion) {
+            var numConsult = String(consultorio);
+            var especialidad = ESPECIALIDADES[numConsult];
+            var paseEl = document.getElementById('anuncio-pase');
+            var destinoEl = document.getElementById('anuncio-destino-texto');
+            var iconoEl = document.getElementById('anuncio-icono');
+
+            document.getElementById('anuncio-nombre').textContent = nombre;
+
+            if (especialidad) {
+                paseEl.textContent = 'Diríjase a';
+                destinoEl.textContent = especialidad;
+                iconoEl.textContent = numConsult === '6' ? '🦷' : numConsult === '8' ? '🧠' : '🏥';
+            } else {
+                paseEl.textContent = 'Pase al';
+                destinoEl.textContent = 'CONSULTORIO ' + numConsult;
+                iconoEl.textContent = '📢';
+            }
+
+            document.getElementById('anuncio-repeticion').textContent =
+                '🔁 Llamado ' + numRepeticion + ' de ' + VECES_REPETIR;
+
+            // Reiniciar animaciones forzando reflow
+            var nombreEl = document.getElementById('anuncio-nombre');
+            nombreEl.style.animation = 'none';
+            nombreEl.getBoundingClientRect();
+            nombreEl.style.animation = '';
+
+            document.getElementById('anuncio-overlay').classList.add('active');
+            iniciarProgressBar(TIEMPO_MOSTRAR);
+        }
+
+        function ocultarOverlay() {
+            document.getElementById('anuncio-overlay').classList.remove('active');
+            resetProgressBar();
+        }
+
+        // ========== PROCESAMIENTO DE ANUNCIOS ==========
+        function anunciarCompleto(item, callback) {
+            var nombre = item.nombre;
+            var consultorio = String(item.consultorio);
+            var esEspecialidad = ESPECIALIDADES[consultorio];
+            var destino, preposicion;
+
+            if (esEspecialidad) {
+                destino = esEspecialidad;
+                preposicion = 'a';
+            } else {
+                destino = 'consultorio ' + consultorio;
+                preposicion = 'al';
+            }
+
+            var texto = nombre + ', por favor diríjase ' + preposicion + ' ' + destino;
+            var rep = 1;
+            idActualAnunciando = item.id; // Marcar como ocupado
+
+            function hacerAnuncio() {
+                console.log('[TV] Anuncio rep', rep, 'de', VECES_REPETIR, ':', nombre);
+                mostrarOverlay(nombre, consultorio, rep);
+                hablar(texto);
+
+                setTimeout(function () {
+                    if (rep < VECES_REPETIR) {
+                        rep++;
+                        setTimeout(hacerAnuncio, PAUSA_REPETICION);
+                    } else {
+                        ocultarOverlay();
+                        var xhr = new XMLHttpRequest();
+                        xhr.open('POST', API_ANUNCIADO, true);
+                        xhr.setRequestHeader('Content-Type', 'application/json');
+                        xhr.send(JSON.stringify({ id: item.id }));
+                        
+                        idActualAnunciando = null; // Liberar para posibles repeticiones manuales
+                        setTimeout(callback, 1000);
+                    }
+                }, TIEMPO_MOSTRAR);
+            }
+
+            hacerAnuncio();
+        }
+
+        function procesarCola() {
+            if (procesandoAnuncio || colaAnuncios.length === 0) return;
+            procesandoAnuncio = true;
+            var item = colaAnuncios.shift();
+            anunciarCompleto(item, function () {
+                procesandoAnuncio = false;
+                procesarCola();
+            });
+        }
+
+        // ========== RENDERIZADO — PANEL PROTAGONISTA ==========
+        var ultimoLlamadoId = null;
+
+        var estadoLlamadosJson = "";
+
+        function renderLlamadosActivos(lista) {
+            var container = document.getElementById('llamados-list');
+
+            // ⚡️ Optimización: Solo actualizar si la lista cambió de verdad
+            var actualJson = JSON.stringify(lista);
+            if (actualJson === estadoLlamadosJson) return;
+            estadoLlamadosJson = actualJson;
+
+            if (!lista || lista.length === 0) {
+                container.innerHTML = `
+                    <div class="vacio-mensaje">
+                        <div class="vacio-icono">🏥</div>
+                        <div>Esperando llamados...</div>
+                    </div>`;
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < lista.length; i++) {
+                var item = lista[i];
+                var esPrimero = (i === 0);
+                var numConsult = String(item.consultorio);
+                var esEspec = ESPECIALIDADES[numConsult];
+                
+                var label = esEspec ? 'SERVICIO' : 'CONSULTORIO';
+                var valor = esEspec ? esEspec : numConsult;
+                var claseCard = esPrimero ? 'llamado-card primero' : 'llamado-card';
+
+                html += `
+                    <div class="${claseCard}">
+                        <div class="llamado-info">
+                            <div class="llamado-nombre">${item.nombre}</div>
+                        </div>
+                        <div class="llamado-destino">
+                            <div class="destino-label">${label}</div>
+                            <div class="destino-valor">${valor}</div>
+                        </div>
+                    </div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        // ========== RENDERIZADO — HISTORIAL ==========
+        var estadoHistorialJson = "";
+
+        function renderHistorial(lista) {
+            var container = document.getElementById('historial-list');
+
+            // ⚡️ Optimización: Solo actualizar si el historial cambió
+            var actualJson = JSON.stringify(lista);
+            if (actualJson === estadoHistorialJson) return;
+            estadoHistorialJson = actualJson;
+
+            if (!lista || lista.length === 0) {
+                container.innerHTML = '<div class="historial-vacio">Sin registros hoy</div>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < lista.length; i++) {
+                var item = lista[i];
+                var hora = new Date(item.fecha).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+                var nc = String(item.consultorio);
+                var espec = ESPECIALIDADES[nc];
+                var badge = espec ? espec.substring(0, 3) : ('C' + nc);
+                html += '<div class="historial-item">' +
+                    '<span class="historial-nombre">' + item.nombre + '</span>' +
+                    '<span class="historial-badge">' + badge + '</span>' +
+                    '<span class="historial-hora">' + hora + '</span>' +
+                    '</div>';
+            }
+            container.innerHTML = html;
+        }
+
+        // ========== POLLING ==========
+        function obtenerDatos() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', API_URL, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    try {
+                        var data = JSON.parse(xhr.responseText);
+                        if (data.success) {
+                            renderLlamadosActivos(data.llamados_activos);
+                            renderHistorial(data.historial);
+
+                            for (var i = 0; i < data.pendientes_tts.length; i++) {
+                                var item = data.pendientes_tts[i];
+                                var yaEnCola = false;
+                                for (var j = 0; j < colaAnuncios.length; j++) {
+                                    if (colaAnuncios[j].id === item.id) { yaEnCola = true; break; }
+                                }
+                                if (!yaEnCola && item.id !== idActualAnunciando) {
+                                    // ⚡️ Optimización: Ya no usamos un cooldown de 15s (idYaProcesados),
+                                    // sino que comprobamos que no sea la persona que se está anunciando ahora mismo.
+                                    console.log('[TV] Agregando a cola:', item.nombre);
+                                    colaAnuncios.push(item);
+                                }
+                            }
+
+                            procesarCola();
+                        }
+                    } catch (e) {
+                        console.error('[TV] Error parsing:', e);
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+        // ========== INICIAR ==========
+        console.log('[TV] Iniciando... Polling cada', INTERVALO_POLLING, 'ms');
+        obtenerDatos();
+        setInterval(obtenerDatos, INTERVALO_POLLING);
+    </script>
+</body>
+
+</html>
